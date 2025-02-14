@@ -68,7 +68,7 @@
             <div class="relative">
               <div class="w-32 h-32 rounded-full overflow-hidden">
                 <img 
-                  :src="userInfo.profileImage || '/src/assets/test_image.jpg'" 
+                  :src="userInfo.profileImage || '/default-profile.jpg'" 
                   alt="프로필 이미지"
                   class="w-full h-full object-cover"
                 >
@@ -110,88 +110,6 @@
                   </svg>
                   {{ userInfo.phone }}
                 </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- 프로필 섹션과 반려동물 섹션 사이에 추가 -->
-        <section v-if="userInfo.isPetSitter" class="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold text-gray-900">나의 펫시터 정보</h2>
-            <button
-              @click="openEditPetSitterModal"
-              class="px-4 py-2 text-[#6C47FF] border border-[#6C47FF] rounded-lg text-sm font-medium hover:bg-[#F3F0FF] transition-colors"
-            >
-              정보 수정
-            </button>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- 기본 정보 -->
-            <div class="space-y-4">
-              <div>
-                <h3 class="text-sm font-medium text-gray-500 mb-1">활동 지역</h3>
-                <p class="text-gray-900">{{ userInfo.petSitterInfo.location }}</p>
-              </div>
-              <div>
-                <h3 class="text-sm font-medium text-gray-500 mb-1">시간당 요금</h3>
-                <p class="text-[#6C47FF] font-bold">{{ formatPrice(userInfo.petSitterInfo.hourlyRate) }}/시간</p>
-              </div>
-              <div>
-                <h3 class="text-sm font-medium text-gray-500 mb-1">돌봄 가능한 반려동물</h3>
-                <div class="flex flex-wrap gap-2">
-                  <span 
-                    v-for="type in userInfo.petSitterInfo.petTypes" 
-                    :key="type"
-                    class="px-2 py-1 bg-[#F3F0FF] text-[#6C47FF] rounded-full text-xs"
-                  >
-                    {{ getPetTypeLabel(type) }}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- 자기소개 및 경험 -->
-            <div class="space-y-4">
-              <div>
-                <h3 class="text-sm font-medium text-gray-500 mb-1">자기소개</h3>
-                <p class="text-gray-900 whitespace-pre-line">{{ userInfo.petSitterInfo.introduction }}</p>
-              </div>
-              <div>
-                <h3 class="text-sm font-medium text-gray-500 mb-1">보유 자격증</h3>
-                <div class="flex flex-wrap gap-2">
-                  <a 
-                    v-for="cert in userInfo.petSitterInfo.certificates" 
-                    :key="cert.id"
-                    :href="cert.url"
-                    class="text-[#6C47FF] hover:underline text-sm"
-                    target="_blank"
-                  >
-                    {{ cert.name }}
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <!-- 통계 -->
-            <div class="md:col-span-2 grid grid-cols-3 gap-4 mt-4">
-              <div class="bg-gray-50 rounded-lg p-4 text-center">
-                <p class="text-gray-500 text-sm mb-1">평균 평점</p>
-                <div class="flex items-center justify-center gap-1">
-                  <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                  <span class="text-xl font-bold text-gray-900">{{ userInfo.petSitterInfo.rating }}</span>
-                </div>
-              </div>
-              <div class="bg-gray-50 rounded-lg p-4 text-center">
-                <p class="text-gray-500 text-sm mb-1">총 돌봄 횟수</p>
-                <p class="text-xl font-bold text-gray-900">{{ userInfo.petSitterInfo.totalCare }}회</p>
-              </div>
-              <div class="bg-gray-50 rounded-lg p-4 text-center">
-                <p class="text-gray-500 text-sm mb-1">이번 달 수입</p>
-                <p class="text-xl font-bold text-[#6C47FF]">{{ formatPrice(userInfo.petSitterInfo.monthlyIncome) }}</p>
               </div>
             </div>
           </div>
@@ -246,15 +164,6 @@
       :user-info="userInfo"
       @close="closePetSitterModal"
     />
-
-    <!-- 펫시터 정보 수정 모달 추가 -->
-    <EditPetSitterModal
-      v-if="isEditPetSitterModalOpen"
-      :is-open="isEditPetSitterModalOpen"
-      :pet-sitter-info="userInfo.petSitterInfo"
-      @close="closeEditPetSitterModal"
-      @save="handlePetSitterUpdate"
-    />
   </div>
 </template>
 
@@ -263,7 +172,6 @@ import ChangePasswordModal from './modals/ChangePasswordModal.vue'
 import EditProfileModal from './modals/EditProfileModal.vue'
 import WithdrawModal from './modals/WithdrawModal.vue'
 import PetSitterRegisterModal from './modals/PetSitterRegisterModal.vue'
-import EditPetSitterModal from './modals/EditPetSitterModal.vue'
 
 export default {
   name: 'MyPage',
@@ -271,8 +179,7 @@ export default {
     ChangePasswordModal,
     EditProfileModal,
     WithdrawModal,
-    PetSitterRegisterModal,
-    EditPetSitterModal
+    PetSitterRegisterModal
   },
   data() {
     return {
@@ -287,41 +194,26 @@ export default {
         name: '김민서',
         email: 'minseo@example.com',
         phone: '010-1234-5678',
-        profileImage: '/src/assets/test_image.jpg',
-        isPetSitter: true,
-        petSitterInfo: {
-          location: '서울시 강남구',
-          hourlyRate: 15000,
-          petTypes: ['dog', 'cat', 'bird'],
-          introduction: '반려동물을 사랑하는 마음으로 정성껏 돌보겠습니다.\n3년간의 펫시터 경험이 있습니다.',
-          certificates: [
-            { id: 1, name: '반려동물관리사', url: '#' },
-            { id: 2, name: '동물행동교정사', url: '#' }
-          ],
-          rating: 4.9,
-          totalCare: 128,
-          monthlyIncome: 1250000
-        }
+        profileImage: '/profile.jpg'
       },
       userPets: [
         {
           id: 1,
           name: '초코',
           breed: '골든리트리버',
-          image: '/src/assets/test_image.jpg'
+          image: '/pets/choco.jpg'
         },
         {
           id: 2,
           name: '몽이',
           breed: '말티즈',
-          image: '/src/assets/test_image.jpg'
+          image: '/pets/mongi.jpg'
         }
       ],
       isPasswordModalOpen: false,
       isEditModalOpen: false,
       isWithdrawModalOpen: false,
-      isPetSitterModalOpen: false,
-      isEditPetSitterModalOpen: false
+      isPetSitterModalOpen: false
     }
   },
   computed: {
@@ -365,32 +257,6 @@ export default {
     },
     closePetSitterModal() {
       this.isPetSitterModalOpen = false
-    },
-    openEditPetSitterModal() {
-      this.isEditPetSitterModalOpen = true
-    },
-    closeEditPetSitterModal() {
-      this.isEditPetSitterModalOpen = false
-    },
-    handlePetSitterUpdate(updatedInfo) {
-      this.userInfo.petSitterInfo = {
-        ...this.userInfo.petSitterInfo,
-        ...updatedInfo
-      }
-      this.closeEditPetSitterModal()
-    },
-    formatPrice(price) {
-      return price.toLocaleString() + '원'
-    },
-    getPetTypeLabel(type) {
-      const labels = {
-        dog: '강아지',
-        cat: '고양이',
-        bird: '조류',
-        reptile: '파충류',
-        other: '기타'
-      }
-      return labels[type] || type
     }
   }
 }

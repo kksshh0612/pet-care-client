@@ -68,7 +68,7 @@
             <div class="relative">
               <div class="w-32 h-32 rounded-full overflow-hidden">
                 <img 
-                  :src="userInfo.profileImage || '/src/assets/test_image.jpg'" 
+                  :src="userInfo.profileImage || '/default-profile.jpg'" 
                   alt="프로필 이미지"
                   class="w-full h-full object-cover"
                 >
@@ -249,7 +249,6 @@
 
     <!-- 펫시터 정보 수정 모달 추가 -->
     <EditPetSitterModal
-      v-if="isEditPetSitterModalOpen"
       :is-open="isEditPetSitterModalOpen"
       :pet-sitter-info="userInfo.petSitterInfo"
       @close="closeEditPetSitterModal"
@@ -287,7 +286,7 @@ export default {
         name: '김민서',
         email: 'minseo@example.com',
         phone: '010-1234-5678',
-        profileImage: '/src/assets/test_image.jpg',
+        profileImage: '/profile.jpg',
         isPetSitter: true,
         petSitterInfo: {
           location: '서울시 강남구',
@@ -308,13 +307,13 @@ export default {
           id: 1,
           name: '초코',
           breed: '골든리트리버',
-          image: '/src/assets/test_image.jpg'
+          image: '/pets/choco.jpg'
         },
         {
           id: 2,
           name: '몽이',
           breed: '말티즈',
-          image: '/src/assets/test_image.jpg'
+          image: '/pets/mongi.jpg'
         }
       ],
       isPasswordModalOpen: false,
@@ -377,7 +376,6 @@ export default {
         ...this.userInfo.petSitterInfo,
         ...updatedInfo
       }
-      this.closeEditPetSitterModal()
     },
     formatPrice(price) {
       return price.toLocaleString() + '원'

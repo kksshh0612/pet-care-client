@@ -249,7 +249,6 @@
 
     <!-- 펫시터 정보 수정 모달 추가 -->
     <EditPetSitterModal
-      v-if="isEditPetSitterModalOpen"
       :is-open="isEditPetSitterModalOpen"
       :pet-sitter-info="userInfo.petSitterInfo"
       @close="closeEditPetSitterModal"
@@ -377,7 +376,6 @@ export default {
         ...this.userInfo.petSitterInfo,
         ...updatedInfo
       }
-      this.closeEditPetSitterModal()
     },
     formatPrice(price) {
       return price.toLocaleString() + '원'

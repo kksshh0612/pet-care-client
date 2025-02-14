@@ -179,18 +179,7 @@
           <div class="space-y-12">
             <!-- 사료 카테고리 -->
             <div>
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-gray-900">사료</h3>
-                <button 
-                  class="text-[#6C47FF] text-sm font-medium hover:underline flex items-center gap-1"
-                  @click="viewMoreProducts('food')"
-                >
-                  더보기
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-4">사료</h3>
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 <div v-for="product in getFoodProducts" :key="product.id" 
                      class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
@@ -224,18 +213,7 @@
 
             <!-- 위생용품 카테고리 -->
             <div>
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-gray-900">위생용품</h3>
-                <button 
-                  class="text-[#6C47FF] text-sm font-medium hover:underline flex items-center gap-1"
-                  @click="viewMoreProducts('hygiene')"
-                >
-                  더보기
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-4">위생용품</h3>
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 <div v-for="product in getHygieneProducts" :key="product.id" 
                      class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
@@ -246,18 +224,7 @@
 
             <!-- 의류 카테고리 -->
             <div>
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-gray-900">의류</h3>
-                <button 
-                  class="text-[#6C47FF] text-sm font-medium hover:underline flex items-center gap-1"
-                  @click="viewMoreProducts('clothing')"
-                >
-                  더보기
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-4">의류</h3>
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 <div v-for="product in getClothingProducts" :key="product.id" 
                      class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
@@ -268,18 +235,7 @@
 
             <!-- 식기/그릇 카테고리 -->
             <div>
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-gray-900">식기/그릇</h3>
-                <button 
-                  class="text-[#6C47FF] text-sm font-medium hover:underline flex items-center gap-1"
-                  @click="viewMoreProducts('bowl')"
-                >
-                  더보기
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-4">식기/그릇</h3>
               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 <div v-for="product in getBowlProducts" :key="product.id" 
                      class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
@@ -664,10 +620,6 @@ export default {
           this.selectedPetTypes = ['all']
         }
       }
-    },
-    viewMoreProducts(category) {
-      // 카테고리별 상품 목록 페이지로 이동하거나 더 많은 상품을 로드
-      console.log(`${category} 카테고리 더보기 클릭`)
     }
   }
 }

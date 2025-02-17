@@ -97,8 +97,6 @@ export default {
         const response = await axios.post('/api/v1/member/login', {
           emailAddress: this.emailAddress,
           password: this.password
-        }, {
-          withCredentials: true  // 세션 쿠키를 주고받기 위해 필요
         })
 
         console.log('로그인 응답:', response)
@@ -106,10 +104,7 @@ export default {
         if (response.status === 200) {
           this.$store.commit('setLoginStatus', true)
           this.$store.commit('setUserInfo', response.data)
-          
-          // 리다이렉트 URL이 있으면 해당 URL로, 없으면 메인 페이지로
-          const redirectUrl = this.$route.query.redirect || '/'
-          router.push(redirectUrl)
+          router.push('/')
         }
       } catch (error) {
         console.error('로그인 에러:', error)

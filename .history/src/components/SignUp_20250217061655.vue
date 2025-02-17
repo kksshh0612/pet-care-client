@@ -94,14 +94,12 @@
 
             <!-- 전화번호 입력 -->
             <div>
-              <label for="phoneNumber" class="block text-[#333333] text-sm mb-2">전화번호</label>
+              <label for="phone" class="block text-[#333333] text-sm mb-2">전화번호</label>
               <input
-                id="phoneNumber"
-                v-model="phoneNumber"
+                id="phone"
+                v-model="phone"
                 type="tel"
                 required
-                @input="formatPhoneNumber"
-                maxlength="13"
                 class="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:outline-none focus:border-[#6C47FF] focus:ring-1 focus:ring-[#6C47FF] text-sm"
                 placeholder="010-0000-0000"
               />
@@ -144,7 +142,7 @@ export default {
       password: '',
       passwordConfirm: '',
       name: '',
-      phoneNumber: '',
+      phone: '',
       errorMessage: '',
       emailError: '',
       emailSuccess: '',
@@ -158,7 +156,7 @@ export default {
              this.password && 
              this.passwordConfirm && 
              this.name && 
-             this.phoneNumber &&
+             this.phone && 
              this.isEmailVerified &&
              this.password === this.passwordConfirm
     }
@@ -204,18 +202,6 @@ export default {
       }
     },
 
-    formatPhoneNumber(event) {
-      let value = event.target.value.replace(/[^0-9]/g, '') // 숫자만 추출
-      
-      if (value.length > 3 && value.length <= 7) {
-        value = value.slice(0, 3) + '-' + value.slice(3)
-      } else if (value.length > 7) {
-        value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7)
-      }
-      
-      this.phoneNumber = value
-    },
-
     async handleSignUp() {
       if (!this.isFormValid) {
         this.errorMessage = '모든 정보를 올바르게 입력해주세요.'
@@ -232,10 +218,10 @@ export default {
           emailAddress: this.emailAddress,
           password: this.password,
           name: this.name,
-          phoneNumber: this.phoneNumber
+          phone: this.phone
         })
 
-        if (response.status === 200) {
+        if (response.data.success) {
           alert('회원가입이 완료되었습니다.')
           this.$router.push('/login')
         }

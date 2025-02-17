@@ -16,11 +16,11 @@
           <div class="space-y-4">
             <!-- 이메일 입력 -->
             <div>
-              <label for="emailAddress" class="block text-[#333333] text-sm mb-2">이메일</label>
+              <label for="email" class="block text-[#333333] text-sm mb-2">이메일</label>
               <div class="flex gap-2">
                 <input
-                  id="emailAddress"
-                  v-model="emailAddress"
+                  id="email"
+                  v-model="email"
                   type="email"
                   required
                   :disabled="isEmailVerified"
@@ -35,7 +35,7 @@
                 <button
                   type="button"
                   @click="verifyEmail"
-                  :disabled="!emailAddress || isEmailVerified"
+                  :disabled="!email || isEmailVerified"
                   class="px-4 py-2 bg-[#6C47FF] text-white rounded-lg text-sm font-medium hover:bg-[#5835FF] transition-colors disabled:bg-gray-300"
                 >
                   중복확인
@@ -94,14 +94,12 @@
 
             <!-- 전화번호 입력 -->
             <div>
-              <label for="phoneNumber" class="block text-[#333333] text-sm mb-2">전화번호</label>
+              <label for="phone" class="block text-[#333333] text-sm mb-2">전화번호</label>
               <input
-                id="phoneNumber"
-                v-model="phoneNumber"
+                id="phone"
+                v-model="phone"
                 type="tel"
                 required
-                @input="formatPhoneNumber"
-                maxlength="13"
                 class="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:outline-none focus:border-[#6C47FF] focus:ring-1 focus:ring-[#6C47FF] text-sm"
                 placeholder="010-0000-0000"
               />
@@ -144,7 +142,7 @@ export default {
       password: '',
       passwordConfirm: '',
       name: '',
-      phoneNumber: '',
+      phone: '',
       errorMessage: '',
       emailError: '',
       emailSuccess: '',
@@ -154,18 +152,18 @@ export default {
   },
   computed: {
     isFormValid() {
-      return this.emailAddress && 
+      return this.email && 
              this.password && 
              this.passwordConfirm && 
              this.name && 
-             this.phoneNumber &&
+             this.phone && 
              this.isEmailVerified &&
              this.password === this.passwordConfirm
     }
   },
   methods: {
     async verifyEmail() {
-      if (!this.emailAddress) {
+      if (!this.email) {
         this.emailError = '이메일을 입력해주세요.'
         this.emailSuccess = ''
         return
@@ -173,7 +171,7 @@ export default {
 
       try {
         await axios.post('/api/v1/member/email', {
-          emailAddress: this.emailAddress
+          email: this.email
         })
         
         this.isEmailVerified = true
@@ -204,18 +202,6 @@ export default {
       }
     },
 
-    formatPhoneNumber(event) {
-      let value = event.target.value.replace(/[^0-9]/g, '') // 숫자만 추출
-      
-      if (value.length > 3 && value.length <= 7) {
-        value = value.slice(0, 3) + '-' + value.slice(3)
-      } else if (value.length > 7) {
-        value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7)
-      }
-      
-      this.phoneNumber = value
-    },
-
     async handleSignUp() {
       if (!this.isFormValid) {
         this.errorMessage = '모든 정보를 올바르게 입력해주세요.'
@@ -229,13 +215,13 @@ export default {
 
       try {
         const response = await axios.post('/api/v1/member', {
-          emailAddress: this.emailAddress,
+          email: this.email,
           password: this.password,
           name: this.name,
-          phoneNumber: this.phoneNumber
+          phone: this.phone
         })
 
-        if (response.status === 200) {
+        if (response.data.success) {
           alert('회원가입이 완료되었습니다.')
           this.$router.push('/login')
         }
@@ -249,7 +235,7 @@ export default {
     }
   },
   watch: {
-    emailAddress() {
+    email() {
       // 이메일이 변경되면 인증 상태 초기화
       this.isEmailVerified = false
       this.emailError = ''

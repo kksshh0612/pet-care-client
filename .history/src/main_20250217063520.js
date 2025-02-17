@@ -41,24 +41,15 @@ axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 // CORS 관련 설정
 axios.defaults.headers.common['Access-Control-Allow-Credentials'] = true
 
-// 응답 인터셉터 수정
+// 응답 인터셉터 추가
 axios.interceptors.response.use(
   response => response,
   error => {
-    // 401 에러(인증 실패) 처리
+    // 401 에러(인증 실패)시 로그인 페이지로 리다이렉션
     if (error.response?.status === 401) {
-      // 현재 페이지가 로그인이 필요한 페이지인 경우에만 리다이렉션
-      const authRequiredPages = ['/mypage', '/payment']
-      const currentPath = router.currentRoute.value.path
-      
-      if (authRequiredPages.includes(currentPath)) {
-        store.commit('setLoginStatus', false)
-        store.commit('setUserInfo', null)
-        router.push({
-          path: '/login',
-          query: { redirect: currentPath }
-        })
-      }
+      store.commit('setLoginStatus', false)
+      store.commit('setUserInfo', null)
+      router.push('/login')
     }
     return Promise.reject(error)
   }

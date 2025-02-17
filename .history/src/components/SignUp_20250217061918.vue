@@ -100,8 +100,6 @@
                 v-model="phoneNumber"
                 type="tel"
                 required
-                @input="formatPhoneNumber"
-                maxlength="13"
                 class="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:outline-none focus:border-[#6C47FF] focus:ring-1 focus:ring-[#6C47FF] text-sm"
                 placeholder="010-0000-0000"
               />
@@ -204,18 +202,6 @@ export default {
       }
     },
 
-    formatPhoneNumber(event) {
-      let value = event.target.value.replace(/[^0-9]/g, '') // 숫자만 추출
-      
-      if (value.length > 3 && value.length <= 7) {
-        value = value.slice(0, 3) + '-' + value.slice(3)
-      } else if (value.length > 7) {
-        value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7)
-      }
-      
-      this.phoneNumber = value
-    },
-
     async handleSignUp() {
       if (!this.isFormValid) {
         this.errorMessage = '모든 정보를 올바르게 입력해주세요.'
@@ -236,7 +222,7 @@ export default {
         })
 
         if (response.status === 200) {
-          alert('회원가입이 완료되었습니다.')
+          alert('회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.')
           this.$router.push('/login')
         }
       } catch (error) {

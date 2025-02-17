@@ -1,6 +1,5 @@
 <script>
 import Header from './components/common/Header.vue'
-import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'App',
@@ -8,20 +7,16 @@ export default {
     Header
   },
   computed: {
-    ...mapState(['isLoggedIn']),
     isAuthPage() {
       return ['/login', '/signup'].includes(this.$route.path)
     }
   },
   methods: {
-    ...mapActions(['checkLoginStatus']),
     handleLoginSuccess(userData) {
-      this.$store.commit('setLoginStatus', true)
-      this.$store.commit('setUserInfo', userData)
+      if (this.$refs.header) {
+        this.$refs.header.updateLoginStatus(userData)
+      }
     }
-  },
-  async created() {
-    await this.checkLoginStatus()
   }
 }
 </script>

@@ -16,11 +16,11 @@
           <div class="space-y-4">
             <!-- 이메일 입력 -->
             <div>
-              <label for="emailAddress" class="block text-[#333333] text-sm mb-2">이메일</label>
+              <label for="email" class="block text-[#333333] text-sm mb-2">이메일</label>
               <div class="flex gap-2">
                 <input
-                  id="emailAddress"
-                  v-model="emailAddress"
+                  id="email"
+                  v-model="email"
                   type="email"
                   required
                   :disabled="isEmailVerified"
@@ -35,7 +35,7 @@
                 <button
                   type="button"
                   @click="verifyEmail"
-                  :disabled="!emailAddress || isEmailVerified"
+                  :disabled="!email || isEmailVerified"
                   class="px-4 py-2 bg-[#6C47FF] text-white rounded-lg text-sm font-medium hover:bg-[#5835FF] transition-colors disabled:bg-gray-300"
                 >
                   중복확인
@@ -43,9 +43,6 @@
               </div>
               <p v-if="emailError" class="mt-1 text-sm text-red-500">
                 {{ emailError }}
-              </p>
-              <p v-if="emailSuccess" class="mt-1 text-sm text-green-500">
-                {{ emailSuccess }}
               </p>
             </div>
 
@@ -72,11 +69,7 @@
                 required
                 class="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:outline-none focus:border-[#6C47FF] focus:ring-1 focus:ring-[#6C47FF] text-sm"
                 placeholder="비밀번호를 다시 입력하세요"
-                @input="checkPasswordMatch"
               />
-              <p v-if="passwordError" class="mt-1 text-sm text-red-500">
-                {{ passwordError }}
-              </p>
             </div>
 
             <!-- 이름 입력 -->
@@ -94,14 +87,12 @@
 
             <!-- 전화번호 입력 -->
             <div>
-              <label for="phoneNumber" class="block text-[#333333] text-sm mb-2">전화번호</label>
+              <label for="phone" class="block text-[#333333] text-sm mb-2">전화번호</label>
               <input
-                id="phoneNumber"
-                v-model="phoneNumber"
+                id="phone"
+                v-model="phone"
                 type="tel"
                 required
-                @input="formatPhoneNumber"
-                maxlength="13"
                 class="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:outline-none focus:border-[#6C47FF] focus:ring-1 focus:ring-[#6C47FF] text-sm"
                 placeholder="010-0000-0000"
               />
@@ -140,45 +131,41 @@ export default {
   name: 'SignUp',
   data() {
     return {
-      emailAddress: '',
+      email: '',
       password: '',
       passwordConfirm: '',
       name: '',
-      phoneNumber: '',
+      phone: '',
       errorMessage: '',
       emailError: '',
-      emailSuccess: '',
-      passwordError: '',
       isEmailVerified: false
     }
   },
   computed: {
     isFormValid() {
-      return this.emailAddress && 
+      return this.email && 
              this.password && 
              this.passwordConfirm && 
              this.name && 
-             this.phoneNumber &&
+             this.phone && 
              this.isEmailVerified &&
              this.password === this.passwordConfirm
     }
   },
   methods: {
     async verifyEmail() {
-      if (!this.emailAddress) {
+      if (!this.email) {
         this.emailError = '이메일을 입력해주세요.'
-        this.emailSuccess = ''
         return
       }
 
       try {
         await axios.post('/api/v1/member/email', {
-          emailAddress: this.emailAddress
+          email: this.email
         })
         
         this.isEmailVerified = true
         this.emailError = ''
-        this.emailSuccess = '사용 가능한 이메일입니다.'
       } catch (error) {
         if (error.response?.status === 400) {
           this.emailError = '올바른 이메일 형식이 아닙니다.'
@@ -187,33 +174,8 @@ export default {
         } else {
           this.emailError = '이메일 확인에 실패했습니다.'
         }
-        this.emailSuccess = ''
         this.isEmailVerified = false
       }
-    },
-
-    checkPasswordMatch() {
-      if (this.password && this.passwordConfirm) {
-        if (this.password !== this.passwordConfirm) {
-          this.passwordError = '비밀번호가 일치하지 않습니다.'
-        } else {
-          this.passwordError = ''
-        }
-      } else {
-        this.passwordError = ''
-      }
-    },
-
-    formatPhoneNumber(event) {
-      let value = event.target.value.replace(/[^0-9]/g, '') // 숫자만 추출
-      
-      if (value.length > 3 && value.length <= 7) {
-        value = value.slice(0, 3) + '-' + value.slice(3)
-      } else if (value.length > 7) {
-        value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7)
-      }
-      
-      this.phoneNumber = value
     },
 
     async handleSignUp() {
@@ -229,13 +191,13 @@ export default {
 
       try {
         const response = await axios.post('/api/v1/member', {
-          emailAddress: this.emailAddress,
+          email: this.email,
           password: this.password,
           name: this.name,
-          phoneNumber: this.phoneNumber
+          phone: this.phone
         })
 
-        if (response.status === 200) {
+        if (response.data.success) {
           alert('회원가입이 완료되었습니다.')
           this.$router.push('/login')
         }
@@ -249,15 +211,10 @@ export default {
     }
   },
   watch: {
-    emailAddress() {
+    email() {
       // 이메일이 변경되면 인증 상태 초기화
       this.isEmailVerified = false
       this.emailError = ''
-      this.emailSuccess = ''
-    },
-    password() {
-      // 비밀번호가 변경되면 비밀번호 확인 검증
-      this.checkPasswordMatch()
     }
   }
 }

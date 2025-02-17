@@ -68,7 +68,7 @@
             <div class="relative">
               <div class="w-32 h-32 rounded-full overflow-hidden">
                 <img 
-                  :src="userInfo.profileImage" 
+                  :src="userInfo.profileImage || '/src/assets/test_image.jpg'" 
                   alt="프로필 이미지"
                   class="w-full h-full object-cover"
                 >
@@ -102,13 +102,13 @@
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  {{ userInfo.emailAddress }}
+                  {{ userInfo.email }}
                 </p>
                 <p class="flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  {{ userInfo.phoneNumber }}
+                  {{ userInfo.phone }}
                 </p>
               </div>
             </div>
@@ -259,7 +259,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import ChangePasswordModal from './modals/ChangePasswordModal.vue'
 import EditProfileModal from './modals/EditProfileModal.vue'
 import WithdrawModal from './modals/WithdrawModal.vue'
@@ -277,13 +276,47 @@ export default {
   },
   data() {
     return {
-      isSidebarOpen: false, // 초기값을 false로 변경
+      isSidebarOpen: true, // 기본값은 열린 상태
+      sideMenus: [
+        { name: '내 펫 관리', path: '/mypage/pets' },
+        { name: '회원정보 수정', path: '/mypage/edit' },
+        { name: '비밀번호 변경', path: '/mypage/password' },
+        { name: '회원 탈퇴', path: '/mypage/withdraw' }
+      ],
       userInfo: {
-        name: '',
-        emailAddress: '',
-        phoneNumber: '',
-        profileImage: '/default-profile.jpg'
+        name: '김민서',
+        email: 'minseo@example.com',
+        phone: '010-1234-5678',
+        profileImage: '/src/assets/test_image.jpg',
+        isPetSitter: true,
+        petSitterInfo: {
+          location: '서울시 강남구',
+          hourlyRate: 15000,
+          petTypes: ['dog', 'cat', 'bird'],
+          introduction: '반려동물을 사랑하는 마음으로 정성껏 돌보겠습니다.\n3년간의 펫시터 경험이 있습니다.',
+          certificates: [
+            { id: 1, name: '반려동물관리사', url: '#' },
+            { id: 2, name: '동물행동교정사', url: '#' }
+          ],
+          rating: 4.9,
+          totalCare: 128,
+          monthlyIncome: 1250000
+        }
       },
+      userPets: [
+        {
+          id: 1,
+          name: '초코',
+          breed: '골든리트리버',
+          image: '/src/assets/test_image.jpg'
+        },
+        {
+          id: 2,
+          name: '몽이',
+          breed: '말티즈',
+          image: '/src/assets/test_image.jpg'
+        }
+      ],
       isPasswordModalOpen: false,
       isEditModalOpen: false,
       isWithdrawModalOpen: false,
@@ -291,24 +324,12 @@ export default {
       isEditPetSitterModalOpen: false
     }
   },
-  async created() {
-    await this.fetchUserInfo()
+  computed: {
+    currentPath() {
+      return this.$route.path
+    }
   },
   methods: {
-    async fetchUserInfo() {
-      try {
-        const response = await axios.get('/api/v1/member')
-        
-        this.userInfo = {
-          name: response.data.name,
-          emailAddress: response.data.emailAddress,
-          phoneNumber: response.data.phoneNumber,
-          profileImage: '/default-profile.jpg'
-        }
-      } catch (error) {
-        console.error('회원 정보 조회 실패:', error)
-      }
-    },
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen
     },

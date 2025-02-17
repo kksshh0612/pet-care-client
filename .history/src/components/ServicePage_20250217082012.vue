@@ -37,9 +37,9 @@
       <!-- 펫시터 서비스 목록 -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         <div v-for="service in filteredServices" :key="service.id" class="bg-white rounded-lg shadow-md overflow-hidden">
-          <div class="p-6 space-y-6">
-            <!-- 펫시터 프로필 -->
-            <div class="flex items-center gap-4">
+          <!-- 펫시터 프로필 -->
+          <div class="p-6">
+            <div class="flex items-center gap-4 mb-4">
               <img 
                 :src="service.profileImage" 
                 alt="펫시터 프로필" 
@@ -47,16 +47,7 @@
               >
               <div>
                 <h3 class="text-lg font-bold text-gray-900">{{ service.name }}</h3>
-                <div class="flex items-center gap-2 text-sm text-gray-500">
-                  <span>{{ service.location }}</span>
-                  <span class="text-gray-300">|</span>
-                  <div class="flex items-center">
-                    <span class="text-yellow-400">★</span>
-                    <span class="ml-1">{{ service.rating.toFixed(1) }}</span>
-                  </div>
-                  <span class="text-gray-300">|</span>
-                  <span>돌봄 {{ service.totalCare }}회</span>
-                </div>
+                <p class="text-sm text-gray-500">{{ service.location }}</p>
               </div>
             </div>
 
@@ -101,9 +92,9 @@
               <!-- 요금 정보 -->
               <div class="pt-4 border-t">
                 <div class="flex justify-between items-center">
-                  <span class="text-sm text-gray-600">요금</span>
+                  <span class="text-sm text-gray-600">시간당</span>
                   <span class="text-lg font-bold text-[#6C47FF]">
-                    {{ formatPrice(service.price) }}원
+                    {{ formatPrice(service.hourlyRate) }}원
                   </span>
                 </div>
               </div>
@@ -112,7 +103,7 @@
             <!-- 예약하기 버튼 -->
             <button 
               @click="bookService(service)"
-              class="w-full px-4 py-2 bg-[#6C47FF] text-white rounded-lg hover:bg-[#5835FF] transition-colors"
+              class="w-full mt-6 px-4 py-2 bg-[#6C47FF] text-white rounded-lg hover:bg-[#5835FF] transition-colors"
             >
               예약하기
             </button>
@@ -212,11 +203,9 @@ export default {
           location: '서울시 강남구',
           serviceTypes: ['산책', '방문 돌봄', '위탁 돌봄'],
           petSizes: ['small', 'medium'],
-          price: 50000,
+          hourlyRate: 15000,
           availableFrom: '2024-02-01',
-          availableTo: '2024-03-31',
-          rating: 4.8,
-          totalCare: 128
+          availableTo: '2024-03-31'
         },
         {
           id: 2,
@@ -225,11 +214,9 @@ export default {
           location: '서울시 서초구',
           serviceTypes: ['방문 돌봄', '위탁 돌봄'],
           petSizes: ['small', 'medium', 'large'],
-          price: 55000,
+          hourlyRate: 20000,
           availableFrom: '2024-02-01',
-          availableTo: '2024-04-30',
-          rating: 4.9,
-          totalCare: 256
+          availableTo: '2024-04-30'
         },
         {
           id: 3,
@@ -238,11 +225,9 @@ export default {
           location: '서울시 송파구',
           serviceTypes: ['산책', '방문 돌봄'],
           petSizes: ['small'],
-          price: 45000,
+          hourlyRate: 13000,
           availableFrom: '2024-02-15',
-          availableTo: '2024-05-31',
-          rating: 4.7,
-          totalCare: 184
+          availableTo: '2024-05-31'
         },
         {
           id: 4,
@@ -251,11 +236,9 @@ export default {
           location: '서울시 마포구',
           serviceTypes: ['산책', '방문 돌봄', '위탁 돌봄'],
           petSizes: ['small', 'medium'],
-          price: 52000,
+          hourlyRate: 18000,
           availableFrom: '2024-02-10',
-          availableTo: '2024-06-30',
-          rating: 4.9,
-          totalCare: 224
+          availableTo: '2024-06-30'
         }
       ],
       popularPets: [

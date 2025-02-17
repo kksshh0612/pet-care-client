@@ -16,10 +16,10 @@
         <form @submit.prevent="handleLogin" class="space-y-6">
           <div class="space-y-4">
             <div>
-              <label for="emailAddress" class="block text-[#333333] text-sm mb-2">이메일</label>
+              <label for="email" class="block text-[#333333] text-sm mb-2">이메일</label>
               <input
-                id="emailAddress"
-                v-model="emailAddress"
+                id="email"
+                v-model="email"
                 type="email"
                 required
                 class="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:outline-none focus:border-[#6C47FF] focus:ring-1 focus:ring-[#6C47FF] text-sm"
@@ -39,10 +39,6 @@
               />
             </div>
           </div>
-
-          <p v-if="errorMessage" class="text-red-500 text-sm text-center">
-            {{ errorMessage }}
-          </p>
 
           <div class="flex justify-center space-x-4 text-sm">
             <router-link to="/find-id" class="text-[#666666] hover:text-[#6C47FF]">
@@ -75,50 +71,34 @@
 
 <script>
 import axios from 'axios'
-import router from '../router'
 
 export default {
   name: 'MemberLogin',
   data() {
     return {
-      emailAddress: '',
+      email: '',
       password: '',
       errorMessage: ''
     }
   },
   methods: {
     async handleLogin() {
-      if (!this.emailAddress || !this.password) {
-        this.errorMessage = '이메일과 비밀번호를 모두 입력해주세요.'
-        return
-      }
-
       try {
-        const response = await axios.post('/api/v1/member/login', {
-          emailAddress: this.emailAddress,
+        const response = await axios.post('http://localhost:8080/api/auth/login', {
+          email: this.email,
           password: this.password
         }, {
-          withCredentials: true  // 세션 쿠키를 주고받기 위해 필요
+          withCredentials: true // 쿠키/세션을 주고받기 위해 필요
         })
 
-        console.log('로그인 응답:', response)
-
-        if (response.status === 200) {
-          this.$store.commit('setLoginStatus', true)
-          this.$store.commit('setUserInfo', response.data)
-          
-          // 리다이렉트 URL이 있으면 해당 URL로, 없으면 메인 페이지로
-          const redirectUrl = this.$route.query.redirect || '/'
-          router.push(redirectUrl)
+        if (response.data.success) {
+          // 로그인 성공 시 전역 상태 업데이트
+          this.$emit('login-success', response.data.user)
+          // 메인 페이지로 리다이렉트
+          this.$router.push('/')
         }
       } catch (error) {
-        console.error('로그인 에러:', error)
-        
-        if (error.response?.status === 400) {
-          this.errorMessage = '아이디 또는 비밀번호가 일치하지 않습니다.'
-        } else {
-          this.errorMessage = '로그인에 실패했습니다. 잠시 후 다시 시도해주세요.'
-        }
+        this.errorMessage = error.response?.data?.message || '로그인에 실패했습니다.'
       }
     }
   }

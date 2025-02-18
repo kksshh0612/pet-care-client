@@ -58,12 +58,15 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     const isLoggedIn = store.state.isLoggedIn
+    const userInfo = store.state.userInfo
 
     if (!isLoggedIn) {
       next({
         path: '/login',
         query: { redirect: to.fullPath }
       })
+    } else if (to.matched.some(record => record.meta.requiresAdmin) && !userInfo?.isAdmin) {
+      next('/') // 관리자가 아닌 경우 메인 페이지로
     } else {
       next()
     }

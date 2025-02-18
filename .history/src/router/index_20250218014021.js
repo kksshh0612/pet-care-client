@@ -57,15 +57,25 @@ const router = createRouter({
 // 라우터 가드 설정
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    const isLoggedIn = store.state.isLoggedIn
+    // 로그인 상태 체크를 위해 store의 상태를 갱신
+    try {
+      await store.dispatch('checkLoginStatus')  // 서버에서 로그인 상태 확인
+      const isLoggedIn = store.state.isLoggedIn
 
-    if (!isLoggedIn) {
+      if (!isLoggedIn) {
+        next({
+          path: '/login',
+          query: { redirect: to.fullPath }
+        })
+      } else {
+        next()
+      }
+    } catch (error) {
+      console.error('로그인 상태 확인 실패:', error)
       next({
         path: '/login',
         query: { redirect: to.fullPath }
       })
-    } else {
-      next()
     }
   } else {
     next()

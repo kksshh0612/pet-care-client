@@ -1,7 +1,7 @@
 <template>
   <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-      <h3 class="text-lg font-bold mb-6">펫시터 등록</h3>
+      <h3 class="text-lg font-bold mb-6">펫시터 프로필 수정</h3>
       
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- 위치 -->
@@ -60,7 +60,7 @@
 
         <!-- 요금 -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">시간당 요금</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">요금</label>
           <div class="relative">
             <input 
               v-model.number="form.fee"
@@ -99,7 +99,7 @@
             type="submit"
             class="px-6 py-2 bg-[#6C47FF] text-white rounded-lg hover:bg-[#5835FF] transition-colors"
           >
-            등록하기
+            수정하기
           </button>
         </div>
       </form>
@@ -111,16 +111,21 @@
 import axios from 'axios'
 
 export default {
-  name: 'PetSitterRegisterModal',
+  name: 'EditPetSitterModal',
   props: {
     isOpen: {
       type: Boolean,
+      required: true
+    },
+    petSitterInfo: {
+      type: Object,
       required: true
     }
   },
   data() {
     return {
       form: {
+        id: null,
         location: '',
         availableDaysOfWeek: [],
         petCodes: [],
@@ -145,6 +150,21 @@ export default {
       ]
     }
   },
+  watch: {
+    isOpen(newVal) {
+      if (newVal && this.petSitterInfo) {
+        // 모달이 열릴 때 기존 데이터로 폼 초기화
+        this.form = {
+          id: this.petSitterInfo.petSitterId,
+          location: this.petSitterInfo.location,
+          availableDaysOfWeek: [...this.petSitterInfo.availableDays],
+          petCodes: [...this.petSitterInfo.petTypes],
+          fee: this.petSitterInfo.fee,
+          introduction: this.petSitterInfo.introduction
+        }
+      }
+    }
+  },
   methods: {
     toggleDay(day) {
       const index = this.form.availableDaysOfWeek.indexOf(day)
@@ -164,14 +184,15 @@ export default {
     },
     async handleSubmit() {
       try {
-        await axios.post('/api/v1/pet-sitter', this.form)
-        alert('펫시터 등록이 완료되었습니다.')
+        const response = await axios.patch('/api/v1/pet-sitter', this.form)
+        this.$emit('save', response.data)
         this.$emit('close')
+        alert('펫시터 정보가 성공적으로 수정되었습니다.')
       } catch (error) {
-        console.error('펫시터 등록 실패:', error)
-        alert('펫시터 등록에 실패했습니다. 잠시 후 다시 시도해주세요.')
+        console.error('펫시터 정보 수정 실패:', error)
+        alert('펫시터 정보 수정에 실패했습니다. 잠시 후 다시 시도해주세요.')
       }
     }
   }
 }
-</script> 
+</script>

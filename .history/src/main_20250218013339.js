@@ -32,14 +32,18 @@ const routes = [
 ]
 
 // axios 기본 설정
-axios.defaults.baseURL = 'http://localhost:8080'  // 서버 주소
-axios.defaults.withCredentials = true  // CORS 관련 인증 정보 포함
+axios.defaults.baseURL = 'http://localhost:8080'
+axios.defaults.withCredentials = true
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.headers.common['Accept'] = 'application/json'
-axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 
-// CORS 관련 설정
-axios.defaults.headers.common['Access-Control-Allow-Credentials'] = true
+// CORS 관련 헤더 추가
+axios.interceptors.request.use(config => {
+  config.headers['Access-Control-Allow-Origin'] = 'http://localhost:5173'
+  config.headers['Access-Control-Allow-Methods'] = 'GET, POST, PATCH, DELETE'
+  config.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+  return config
+})
 
 // 응답 인터셉터 수정
 axios.interceptors.response.use(

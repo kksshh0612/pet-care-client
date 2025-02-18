@@ -1,26 +1,64 @@
 <template>
   <div class="min-h-screen bg-[#F8F9FD] pt-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- 정렬 옵션 -->
-      <div class="flex justify-end mb-4">
-        <select 
-          v-model="sortOption"
-          class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C47FF]/20 focus:border-[#6C47FF]"
-        >
-          <option value="FEE_DESC">가격 높은순</option>
-          <option value="FEE_ASC">가격 낮은순</option>
-        </select>
+      <!-- 날짜 필터 섹션 -->
+      <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <h2 class="text-xl font-bold text-gray-900">돌봄 날짜 선택</h2>
+          <div class="flex gap-4">
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-700 mb-1">시작일</label>
+              <input 
+                type="date" 
+                v-model="startDate"
+                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C47FF]/20 focus:border-[#6C47FF]"
+                :min="today"
+              >
+            </div>
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-700 mb-1">종료일</label>
+              <input 
+                type="date" 
+                v-model="endDate"
+                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C47FF]/20 focus:border-[#6C47FF]"
+                :min="startDate"
+              >
+            </div>
+            <button 
+              @click="filterServices"
+              class="self-end px-6 py-2 bg-[#6C47FF] text-white rounded-lg hover:bg-[#5835FF] transition-colors shadow-sm hover:shadow-md"
+            >
+              검색
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- 펫시터 서비스 목록 -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        <div v-for="service in sortedServices" :key="service.id" 
+        <div v-for="service in filteredServices" :key="service.id" 
              class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-100">
           <div class="p-6 space-y-6">
-            <!-- 펫시터 정보 -->
-            <div class="flex-1 min-w-0">
-              <h3 class="text-lg font-bold text-gray-900 mb-1">{{ service.petSitterName }}</h3>
-              <p class="text-sm text-gray-600">{{ service.introduction }}</p>
+            <!-- 펫시터 프로필 -->
+            <div class="flex items-start gap-4">
+              <img 
+                :src="service.profileImage" 
+                alt="펫시터 프로필" 
+                class="w-16 h-16 rounded-full object-cover ring-2 ring-[#6C47FF]/10"
+              >
+              <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-bold text-gray-900 mb-1">{{ service.name }}</h3>
+                <div class="flex items-center gap-2 text-sm text-gray-600">
+                  <span class="truncate">{{ service.location }}</span>
+                  <span class="text-gray-300">|</span>
+                  <div class="flex items-center shrink-0">
+                    <span class="text-yellow-400">★</span>
+                    <span class="ml-1 font-medium">{{ service.rating.toFixed(1) }}</span>
+                  </div>
+                  <span class="text-gray-300">|</span>
+                  <span class="shrink-0">돌봄 {{ service.totalCare }}회</span>
+                </div>
+              </div>
             </div>
 
             <!-- 서비스 정보 -->
@@ -34,7 +72,7 @@
                     :key="type"
                     class="px-3 py-1 bg-[#F8F9FD] text-[#6C47FF] rounded-full text-sm font-medium"
                   >
-                    {{ serviceTypeLabels[type] }}
+                    {{ type }}
                   </span>
                 </div>
               </div>
@@ -44,20 +82,20 @@
                 <h4 class="text-sm font-medium text-gray-700 mb-2">돌봄 가능한 크기</h4>
                 <div class="flex flex-wrap gap-2">
                   <span 
-                    v-for="size in service.availableSizes" 
+                    v-for="size in service.petSizes" 
                     :key="size"
                     class="px-3 py-1 bg-[#F8F9FD] text-[#6C47FF] rounded-full text-sm font-medium"
                   >
-                    {{ petSizeLabels[size] }}
+                    {{ getPetSizeLabel(size) }}
                   </span>
                 </div>
               </div>
 
-              <!-- 가능 날짜 -->
+              <!-- 가능 일정 -->
               <div>
-                <h4 class="text-sm font-medium text-gray-700 mb-2">가능 날짜</h4>
+                <h4 class="text-sm font-medium text-gray-700 mb-2">가능 일정</h4>
                 <p class="text-sm text-gray-600 bg-[#F8F9FD] px-3 py-2 rounded-lg">
-                  {{ formatDate(service.availableDay) }}
+                  {{ formatDate(service.availableFrom) }} ~ {{ formatDate(service.availableTo) }}
                 </p>
               </div>
 
@@ -66,7 +104,7 @@
                 <div class="flex justify-between items-center">
                   <span class="text-sm font-medium text-gray-600">요금</span>
                   <span class="text-lg font-bold text-[#6C47FF]">
-                    {{ formatPrice(service.fee) }}원
+                    {{ formatPrice(service.price) }}원
                   </span>
                 </div>
               </div>
@@ -157,63 +195,70 @@
         </div>
       </div>
     </div>
-
-    <!-- 예약 모달 -->
-    <div v-if="showReservationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-xl p-6 w-full max-w-lg">
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="text-lg font-bold">돌봄 서비스 예약</h3>
-          <button 
-            @click="closeReservationModal"
-            class="text-gray-400 hover:text-gray-500"
-          >
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <!-- 예약 내용 -->
-        <div class="bg-gray-50 p-4 rounded-lg mb-6">
-          <div class="space-y-4">
-            <div class="flex justify-between items-center">
-              <span class="text-gray-600">펫시터</span>
-              <span class="font-medium">{{ selectedService.petSitterName }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-gray-600">가능 날짜</span>
-              <span class="font-medium">{{ formatDate(selectedService.availableDay) }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-gray-600">요금</span>
-              <span class="font-medium text-[#6C47FF]">{{ formatPrice(selectedService.fee) }}원</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 버튼 영역 -->
-        <div class="flex justify-end">
-          <button 
-            @click="proceedToPayment"
-            class="px-6 py-2 bg-[#6C47FF] text-white rounded-lg hover:bg-[#5835FF] transition-colors"
-          >
-            예약하기
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import axios from 'axios'
-
 export default {
   name: 'ServicePage',
   data() {
     return {
-      services: [],
+      startDate: '',
+      endDate: '',
+      services: [
+        {
+          id: 1,
+          name: '김펫시터',
+          profileImage: '/src/assets/test_image.jpg',
+          location: '서울시 강남구',
+          serviceTypes: ['산책', '방문 돌봄', '위탁 돌봄'],
+          petSizes: ['small', 'medium'],
+          price: 50000,
+          availableFrom: '2024-02-01',
+          availableTo: '2024-03-31',
+          rating: 4.8,
+          totalCare: 128
+        },
+        {
+          id: 2,
+          name: '이펫시터',
+          profileImage: '/src/assets/test_image.jpg',
+          location: '서울시 서초구',
+          serviceTypes: ['방문 돌봄', '위탁 돌봄'],
+          petSizes: ['small', 'medium', 'large'],
+          price: 55000,
+          availableFrom: '2024-02-01',
+          availableTo: '2024-04-30',
+          rating: 4.9,
+          totalCare: 256
+        },
+        {
+          id: 3,
+          name: '박펫시터',
+          profileImage: '/src/assets/test_image.jpg',
+          location: '서울시 송파구',
+          serviceTypes: ['산책', '방문 돌봄'],
+          petSizes: ['small'],
+          price: 45000,
+          availableFrom: '2024-02-15',
+          availableTo: '2024-05-31',
+          rating: 4.7,
+          totalCare: 184
+        },
+        {
+          id: 4,
+          name: '최펫시터',
+          profileImage: '/src/assets/test_image.jpg',
+          location: '서울시 마포구',
+          serviceTypes: ['산책', '방문 돌봄', '위탁 돌봄'],
+          petSizes: ['small', 'medium'],
+          price: 52000,
+          availableFrom: '2024-02-10',
+          availableTo: '2024-06-30',
+          rating: 4.9,
+          totalCare: 224
+        }
+      ],
       popularPets: [
         {
           id: 1,
@@ -253,54 +298,29 @@ export default {
           ]
         },
         // ... 다른 카테고리들
-      ],
-      showReservationModal: false,
-      selectedService: null,
-      sortOption: 'FEE_DESC',
-      serviceTypeLabels: {
-        'WALK': '산책',
-        'VISIT_CARE': '방문 돌봄',
-        'FOSTER_CARE': '위탁 돌봄'
-      },
-      petSizeLabels: {
-        'SMALL': '소형견(10kg이하)',
-        'MEDIUM': '중형견(10kg~25kg)',
-        'LARGE': '대형견(25kg초과)'
-      }
+      ]
     }
   },
   computed: {
-    ...mapState({
-      isLoggedIn: state => state.isLoggedIn
-    }),
-    sortedServices() {
-      const services = [...this.services]
+    today() {
+      return new Date().toISOString().split('T')[0]
+    },
+    filteredServices() {
+      if (!this.startDate || !this.endDate) return this.services
       
-      switch (this.sortOption) {
-        case 'FEE_DESC':
-          return services.sort((a, b) => b.fee - a.fee)
-        case 'FEE_ASC':
-          return services.sort((a, b) => a.fee - b.fee)
-        default:
-          return services
-      }
+      return this.services.filter(service => {
+        const serviceFrom = new Date(service.availableFrom)
+        const serviceTo = new Date(service.availableTo)
+        const filterFrom = new Date(this.startDate)
+        const filterTo = new Date(this.endDate)
+        
+        return serviceFrom <= filterTo && serviceTo >= filterFrom
+      })
     }
   },
   methods: {
-    async fetchPetSitterServices() {
-      try {
-        const response = await axios.get('/api/v1/pet-sitter-work/list')
-        this.services = response.data.petSitterWorkResponses.map(service => ({
-          petSitterName: service.petSitterName,
-          introduction: service.introduction,
-          serviceTypes: service.serviceTypes,
-          availableSizes: service.availableSizes,
-          availableDay: service.availableDay,
-          fee: service.fee
-        }))
-      } catch (error) {
-        console.error('펫시터 서비스 목록 조회 실패:', error)
-      }
+    filterServices() {
+      console.log('필터링된 서비스:', this.filteredServices)
     },
     formatDate(date) {
       return new Date(date).toLocaleDateString('ko-KR', {
@@ -312,18 +332,17 @@ export default {
     formatPrice(price) {
       return price.toLocaleString()
     },
-    bookService(service) {
-      if (!this.isLoggedIn) {
-        alert('로그인이 필요한 서비스입니다.')
-        this.$router.push({
-          path: '/login',
-          query: { redirect: this.$route.fullPath }
-        })
-        return
+    getPetSizeLabel(size) {
+      const labels = {
+        small: '소형견(10kg이하)',
+        medium: '중형견(10kg~25kg)',
+        large: '대형견(25kg초과)'
       }
-      
-      this.selectedService = service
-      this.showReservationModal = true
+      return labels[size] || size
+    },
+    bookService(service) {
+      console.log('서비스 예약:', service)
+      alert('예약 기능은 준비 중입니다.')
     },
     togglePetType(type) {
       if (type === 'all') {
@@ -343,43 +362,7 @@ export default {
     },
     viewMoreProducts(categoryId) {
       console.log(`${categoryId} 카테고리 더보기 클릭`)
-    },
-    closeReservationModal() {
-      this.showReservationModal = false
-      this.selectedService = null
-    },
-    proceedToPayment() {
-      // 결제 페이지로 이동하면서 예약 정보 전달
-      this.$router.push({
-        path: '/payment',
-        query: {
-          serviceId: this.selectedService.id,
-          amount: this.selectedService.fee
-        }
-      })
     }
-  },
-  async created() {
-    await this.fetchPetSitterServices()
   }
 }
-</script>
-
-<style>
-input[type="date"] {
-  position: relative;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator {
-  background: transparent;
-  bottom: 0;
-  color: transparent;
-  cursor: pointer;
-  height: auto;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: auto;
-}
-</style> 
+</script> 

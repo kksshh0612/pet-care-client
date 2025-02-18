@@ -57,13 +57,29 @@ const router = createRouter({
 // 라우터 가드 설정
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
+    // 로그인 상태 체크를 위해 store의 상태를 갱신
+    await store.dispatch('checkLoginStatus')
+    
     const isLoggedIn = store.state.isLoggedIn
+    const userInfo = store.state.userInfo
+
+    console.log('로그인 상태:', isLoggedIn)
+    console.log('사용자 정보:', userInfo)
+    console.log('관리자 여부:', userInfo?.isAdmin)
 
     if (!isLoggedIn) {
       next({
         path: '/login',
         query: { redirect: to.fullPath }
       })
+    } else if (to.matched.some(record => record.meta.requiresAdmin)) {
+      if (!userInfo?.isAdmin) {
+        console.log('관리자 권한 없음')
+        next('/')
+      } else {
+        console.log('관리자 권한 확인됨')
+        next()
+      }
     } else {
       next()
     }

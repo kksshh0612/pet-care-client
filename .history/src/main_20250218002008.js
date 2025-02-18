@@ -32,8 +32,8 @@ const routes = [
 ]
 
 // axios 기본 설정
-axios.defaults.baseURL = 'http://localhost:8080'  // 서버 주소
-axios.defaults.withCredentials = true  // CORS 관련 인증 정보 포함
+axios.defaults.baseURL = 'http://localhost:8080'
+axios.defaults.withCredentials = true  // 세션 쿠키 전송 허용
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.headers.common['Accept'] = 'application/json'
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'

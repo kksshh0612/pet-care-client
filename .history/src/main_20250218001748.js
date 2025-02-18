@@ -7,6 +7,8 @@ import MemberLogin from './components/MemberLogin.vue'
 import FindId from './components/FindId.vue'
 import FindPassword from './components/FindPassword.vue'
 import axios from 'axios'
+import { createRouter, createWebHistory } from 'vue-router'
+import AdminPage from './components/AdminPage.vue'
 
 const routes = [
   {
@@ -28,12 +30,18 @@ const routes = [
     path: '/find-password',
     name: 'FindPassword',
     component: FindPassword
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: AdminPage,
+    meta: { requiresAuth: true }  // 인증이 필요한 페이지로 설정
   }
 ]
 
 // axios 기본 설정
-axios.defaults.baseURL = 'http://localhost:8080'  // 서버 주소
-axios.defaults.withCredentials = true  // CORS 관련 인증 정보 포함
+axios.defaults.baseURL = 'http://localhost:8080'
+axios.defaults.withCredentials = true  // 세션 쿠키 전송 허용
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.headers.common['Accept'] = 'application/json'
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
@@ -63,6 +71,26 @@ axios.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: routes
+})
+
+// 네비게이션 가드 설정
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // 로그인 상태와 관리자 권한 체크
+    const isAdmin = store.state.userInfo?.isAdmin
+    if (!isAdmin) {
+      next('/login')
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})
 
 const app = createApp(App)
 app.use(router)

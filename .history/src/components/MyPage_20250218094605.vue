@@ -658,7 +658,7 @@ export default {
       try {
         const response = await axios.post('/api/v1/pet-sitter-work', {
           ...this.serviceForm,
-          petSitterId: this.petSitterInfo.id
+          petSitterId: this.userInfo.id
         })
         
         alert('서비스가 등록되었습니다.')

@@ -17,23 +17,18 @@ export default createStore({
   actions: {
     async checkLoginStatus({ commit }) {
       try {
-        const response = await axios.get('/api/v1/member', {
-          withCredentials: true
-        })
-        
-        if (response.status === 200) {
+        const response = await axios.get('/api/v1/members/me')
+        if (response.data) {
           commit('setLoginStatus', true)
           commit('setUserInfo', response.data)
           return true
         }
+        return false
       } catch (error) {
         commit('setLoginStatus', false)
         commit('setUserInfo', null)
-        if (error.response?.status !== 401) {
-          console.error('세션 체크 실패:', error)
-        }
+        return false
       }
-      return false
     },
     async logout({ commit }) {
       try {

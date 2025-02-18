@@ -56,16 +56,31 @@ const router = createRouter({
 
 // 라우터 가드 설정
 router.beforeEach(async (to, from, next) => {
+  // 로그인이 필요한 페이지에 접근할 때
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    const isLoggedIn = store.state.isLoggedIn
+    console.log('로그인 필요한 페이지 접근')
+    
+    try {
+      const isLoggedIn = await store.dispatch('checkLoginStatus')
+      console.log('로그인 상태:', isLoggedIn)
+      console.log('사용자 정보:', store.state.userInfo)
 
-    if (!isLoggedIn) {
+      if (!isLoggedIn) {
+        console.log('비로그인 상태 - 로그인 페이지로 이동')
+        next({
+          path: '/login',
+          query: { redirect: to.fullPath }
+        })
+      } else {
+        console.log('로그인 상태 - 페이지 접근 허용')
+        next()
+      }
+    } catch (error) {
+      console.error('로그인 체크 실패:', error)
       next({
         path: '/login',
         query: { redirect: to.fullPath }
       })
-    } else {
-      next()
     }
   } else {
     next()

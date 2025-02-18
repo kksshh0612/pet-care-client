@@ -18,12 +18,12 @@
       :class="isSidebarOpen ? 'translate-x-0' : '-translate-x-64'"
     >
       <nav class="p-6 space-y-2">
-        <!-- 펫시터 서비스 등록으로 변경 -->
+        <!-- 내 펫 관리 -->
         <button 
-          @click="showServiceRegistrationModal = true"
+          @click="openPetManageModal"
           class="w-full flex items-center px-4 py-3 text-[#6C47FF] rounded-lg hover:bg-[#F3F0FF] transition-colors text-left"
         >
-          <span class="text-sm font-bold">펫시터 서비스 등록</span>
+          <span class="text-sm font-bold">내 펫 관리</span>
         </button>
 
         <!-- 구분선 추가 -->
@@ -104,7 +104,7 @@
             <div class="flex-1">
               <div class="flex items-center justify-between mb-4">
                 <h1 class="text-2xl font-bold text-gray-900">{{ userInfo.name }}</h1>
-                <button 
+                <button
                   v-if="!petSitterInfo"
                   @click="openPetSitterRegisterModal"
                   class="px-4 py-2 bg-[#6C47FF] text-white rounded-lg text-sm font-medium hover:bg-[#5835FF] transition-colors flex items-center gap-2"
@@ -144,13 +144,6 @@
               <span v-else class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
                 승인됨
               </span>
-              <button
-                v-if="userInfo.isPetSitter && petSitterInfo.isApproved"
-                @click="showServiceRegistrationModal = true"
-                class="px-4 py-2 bg-[#6C47FF] text-white rounded-lg text-sm font-medium hover:bg-[#5835FF] transition-colors"
-              >
-                서비스 등록
-              </button>
               <button
                 @click="openEditPetSitterModal"
                 class="px-4 py-2 text-[#6C47FF] border border-[#6C47FF] rounded-lg text-sm font-medium hover:bg-[#F3F0FF] transition-colors"
@@ -247,6 +240,16 @@
           </div>
         </section>
 
+        <!-- 펫시터 프로필 섹션 내부에 추가 -->
+        <div v-if="userInfo && userInfo.isPetSitter" class="mt-4">
+          <button 
+            @click="showRegisterWorkModal = true"
+            class="w-full flex items-center px-4 py-3 text-[#6C47FF] bg-[#F3F0FF] rounded-lg hover:bg-[#E5E0FF] transition-colors"
+          >
+            <span class="text-sm font-bold">펫시터 서비스 등록</span>
+          </button>
+        </div>
+
         <!-- 반려동물 섹션 -->
         <section class="bg-white rounded-2xl shadow-lg p-8">
           <div class="mb-6">
@@ -267,136 +270,6 @@
             </div>
           </div>
         </section>
-
-        <!-- 서비스 등록 모달 -->
-        <div v-if="showServiceRegistrationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div class="bg-white rounded-xl p-6 w-full max-w-lg">
-            <div class="flex justify-between items-center mb-6">
-              <h3 class="text-lg font-bold">펫시터 서비스 등록</h3>
-              <button 
-                @click="showServiceRegistrationModal = false"
-                class="text-gray-400 hover:text-gray-500"
-              >
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
-            <form @submit.prevent="registerPetSitterService" class="space-y-6">
-              <!-- 가능 서비스 종류 -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">가능 서비스 종류</label>
-                <div class="space-y-2">
-                  <label class="flex items-center">
-                    <input 
-                      type="checkbox" 
-                      v-model="serviceForm.serviceTypes" 
-                      value="WALK"
-                      class="rounded border-gray-300 text-[#6C47FF] focus:ring-[#6C47FF]"
-                    >
-                    <span class="ml-2 text-gray-700">산책</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input 
-                      type="checkbox" 
-                      v-model="serviceForm.serviceTypes" 
-                      value="VISIT_CARE"
-                      class="rounded border-gray-300 text-[#6C47FF] focus:ring-[#6C47FF]"
-                    >
-                    <span class="ml-2 text-gray-700">방문돌봄</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input 
-                      type="checkbox" 
-                      v-model="serviceForm.serviceTypes" 
-                      value="FOSTER_CARE"
-                      class="rounded border-gray-300 text-[#6C47FF] focus:ring-[#6C47FF]"
-                    >
-                    <span class="ml-2 text-gray-700">위탁돌봄</span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- 돌봄 가능 사이즈 -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">돌봄 가능 사이즈</label>
-                <div class="space-y-2">
-                  <label class="flex items-center">
-                    <input 
-                      type="checkbox" 
-                      v-model="serviceForm.availableSizes" 
-                      value="SMALL"
-                      class="rounded border-gray-300 text-[#6C47FF] focus:ring-[#6C47FF]"
-                    >
-                    <span class="ml-2 text-gray-700">소형견(10kg이하)</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input 
-                      type="checkbox" 
-                      v-model="serviceForm.availableSizes" 
-                      value="MEDIUM"
-                      class="rounded border-gray-300 text-[#6C47FF] focus:ring-[#6C47FF]"
-                    >
-                    <span class="ml-2 text-gray-700">중형견(10kg~25kg)</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input 
-                      type="checkbox" 
-                      v-model="serviceForm.availableSizes" 
-                      value="LARGE"
-                      class="rounded border-gray-300 text-[#6C47FF] focus:ring-[#6C47FF]"
-                    >
-                    <span class="ml-2 text-gray-700">대형견(25kg초과)</span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- 가능 날짜 -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">가능 날짜</label>
-                <input 
-                  type="date" 
-                  v-model="serviceForm.availableDay"
-                  required
-                  class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C47FF]/20 focus:border-[#6C47FF]"
-                >
-              </div>
-
-              <!-- 요금 -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">1일 요금</label>
-                <div class="relative">
-                  <input 
-                    type="number" 
-                    v-model="serviceForm.fee"
-                    required
-                    min="0"
-                    step="1000"
-                    class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C47FF]/20 focus:border-[#6C47FF]"
-                  >
-                  <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">원</span>
-                </div>
-              </div>
-
-              <div class="flex justify-end gap-4">
-                <button 
-                  type="button"
-                  @click="showServiceRegistrationModal = false"
-                  class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-                >
-                  취소
-                </button>
-                <button 
-                  type="submit"
-                  class="px-6 py-2 bg-[#6C47FF] text-white rounded-lg hover:bg-[#5835FF] transition-colors"
-                >
-                  등록
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
       </div>
     </main>
 
@@ -478,6 +351,14 @@
       @close="closeEditPetSitterModal"
       @save="handlePetSitterUpdate"
     />
+
+    <!-- 모달 추가 -->
+    <RegisterPetSitterWorkModal 
+      :is-open="showRegisterWorkModal"
+      :pet-sitter-id="userInfo?.petSitterId"
+      @close="showRegisterWorkModal = false"
+      @save="fetchPetSitterInfo"
+    />
   </div>
 </template>
 
@@ -489,6 +370,7 @@ import EditProfileModal from './modals/EditProfileModal.vue'
 import WithdrawModal from './modals/WithdrawModal.vue'
 import PetSitterRegisterModal from './modals/PetSitterRegisterModal.vue'
 import EditPetSitterModal from './modals/EditPetSitterModal.vue'
+import RegisterPetSitterWorkModal from './modals/RegisterPetSitterWorkModal.vue'
 
 export default {
   name: 'MyPage',
@@ -497,7 +379,8 @@ export default {
     EditProfileModal,
     WithdrawModal,
     PetSitterRegisterModal,
-    EditPetSitterModal
+    EditPetSitterModal,
+    RegisterPetSitterWorkModal
   },
   computed: {
     ...mapState({
@@ -512,20 +395,14 @@ export default {
       isWithdrawModalOpen: false,
       isPetSitterModalOpen: false,
       isEditPetSitterModalOpen: false,
+      showRegisterWorkModal: false,
       memberForm: {
         name: '',
         emailAddress: '',
         phoneNumber: ''
       },
       errorMessage: '',
-      petSitterInfo: null,
-      showServiceRegistrationModal: false,
-      serviceForm: {
-        serviceTypes: [],
-        availableSizes: [],
-        availableDay: '',
-        fee: 0
-      }
+      petSitterInfo: null
     }
   },
   async created() {
@@ -564,6 +441,9 @@ export default {
     },
     closeWithdrawModal() {
       this.isWithdrawModalOpen = false
+    },
+    openPetManageModal() {
+      // Implementation of openPetManageModal method
     },
     openPetSitterRegisterModal() {
       this.isPetSitterModalOpen = true
@@ -653,28 +533,6 @@ export default {
     },
     formatPrice(price) {
       return price.toLocaleString()
-    },
-    async registerPetSitterService() {
-      try {
-        const response = await axios.post('/api/v1/pet-sitter-work', {
-          ...this.serviceForm,
-          petSitterId: this.petSitterInfo.id
-        })
-        
-        alert('서비스가 등록되었습니다.')
-        this.showServiceRegistrationModal = false
-        
-        // 폼 초기화
-        this.serviceForm = {
-          serviceTypes: [],
-          availableSizes: [],
-          availableDay: '',
-          fee: 0
-        }
-      } catch (error) {
-        console.error('서비스 등록 실패:', error)
-        alert('서비스 등록에 실패했습니다. 잠시 후 다시 시도해주세요.')
-      }
     }
   }
 }

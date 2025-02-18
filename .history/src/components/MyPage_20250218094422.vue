@@ -18,12 +18,12 @@
       :class="isSidebarOpen ? 'translate-x-0' : '-translate-x-64'"
     >
       <nav class="p-6 space-y-2">
-        <!-- 펫시터 서비스 등록으로 변경 -->
+        <!-- 내 펫 관리 -->
         <button 
-          @click="showServiceRegistrationModal = true"
+          @click="openPetManageModal"
           class="w-full flex items-center px-4 py-3 text-[#6C47FF] rounded-lg hover:bg-[#F3F0FF] transition-colors text-left"
         >
-          <span class="text-sm font-bold">펫시터 서비스 등록</span>
+          <span class="text-sm font-bold">내 펫 관리</span>
         </button>
 
         <!-- 구분선 추가 -->
@@ -565,6 +565,9 @@ export default {
     closeWithdrawModal() {
       this.isWithdrawModalOpen = false
     },
+    openPetManageModal() {
+      // Implementation of openPetManageModal method
+    },
     openPetSitterRegisterModal() {
       this.isPetSitterModalOpen = true
     },
@@ -658,7 +661,7 @@ export default {
       try {
         const response = await axios.post('/api/v1/pet-sitter-work', {
           ...this.serviceForm,
-          petSitterId: this.petSitterInfo.id
+          petSitterId: this.userInfo.id
         })
         
         alert('서비스가 등록되었습니다.')

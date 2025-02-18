@@ -202,18 +202,12 @@
         </div>
 
         <!-- 버튼 영역 -->
-        <div class="flex justify-end gap-4">
+        <div class="flex justify-end">
           <button 
             @click="proceedToPayment"
             class="px-6 py-2 bg-[#6C47FF] text-white rounded-lg hover:bg-[#5835FF] transition-colors"
           >
             예약하기
-          </button>
-          <button 
-            @click="proceedToTossPay"
-            class="px-6 py-2 bg-[#0064FF] text-white rounded-lg hover:bg-[#0052CC] transition-colors"
-          >
-            결제하기
           </button>
         </div>
       </div>
@@ -268,7 +262,6 @@ export default {
       try {
         const response = await axios.get('/api/v1/pet-sitter-work/list')
         this.services = response.data.petSitterWorkResponses.map(service => ({
-          id: service.id,
           petSitterName: service.petSitterName,
           introduction: service.introduction,
           serviceTypes: service.serviceTypes,
@@ -307,27 +300,13 @@ export default {
       this.showReservationModal = false
       this.selectedService = null
     },
-    async proceedToPayment() {
-      try {
-        await axios.post('/api/v1/reservation', {
-          petSitterWorkId: this.selectedService.id
-        })
-        
-        alert('예약이 완료되었습니다.')
-        this.closeReservationModal()
-      } catch (error) {
-        console.error('예약 실패:', error)
-        alert('예약에 실패했습니다. 잠시 후 다시 시도해주세요.')
-      }
-    },
-    async proceedToTossPay() {
+    proceedToPayment() {
+      // 결제 페이지로 이동하면서 예약 정보 전달
       this.$router.push({
         path: '/payment',
         query: {
-          id: this.selectedService.id,
-          petSitterName: this.selectedService.petSitterName,
-          availableDay: this.selectedService.availableDay,
-          fee: this.selectedService.fee
+          serviceId: this.selectedService.id,
+          amount: this.selectedService.fee
         }
       })
     },

@@ -322,12 +322,9 @@ export default {
     },
     async proceedToTossPay() {
       this.$router.push({
-        path: '/payment',
-        query: {
-          id: this.selectedService.id,
-          petSitterName: this.selectedService.petSitterName,
-          availableDay: this.selectedService.availableDay,
-          fee: this.selectedService.fee
+        name: 'payment',
+        params: {
+          service: this.selectedService
         }
       })
     },

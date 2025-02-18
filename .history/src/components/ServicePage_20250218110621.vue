@@ -321,15 +321,20 @@ export default {
       }
     },
     async proceedToTossPay() {
-      this.$router.push({
-        path: '/payment',
-        query: {
-          id: this.selectedService.id,
-          petSitterName: this.selectedService.petSitterName,
-          availableDay: this.selectedService.availableDay,
-          fee: this.selectedService.fee
-        }
-      })
+      try {
+        // 결제 요청 정보 생성
+        const response = await axios.post('/api/v1/payment/toss', {
+          petSitterWorkId: this.selectedService.id,
+          amount: this.selectedService.fee
+        })
+        
+        // 토스페이먼츠 결제창 호출
+        const { paymentUrl } = response.data
+        window.location.href = paymentUrl
+      } catch (error) {
+        console.error('결제 초기화 실패:', error)
+        alert('결제 초기화에 실패했습니다. 잠시 후 다시 시도해주세요.')
+      }
     },
     async fetchPetSitterProfiles() {
       try {

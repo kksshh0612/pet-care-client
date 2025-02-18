@@ -41,12 +41,7 @@ export default {
   name: 'Payment',
   data() {
     return {
-      service: {
-        id: '',
-        petSitterName: '',
-        availableDay: '',
-        fee: 0
-      }
+      service: null
     }
   },
   methods: {
@@ -62,22 +57,12 @@ export default {
     },
     async proceedToTossPay() {
       try {
-        // 토스페이먼츠 테스트 결제 URL로 직접 이동
-        const successUrl = `${window.location.origin}/success`
-        const failUrl = `${window.location.origin}/fail`
+        const response = await axios.post('/api/v1/payment/toss', {
+          petSitterWorkId: this.service.id,
+          amount: this.service.fee
+        })
         
-        const paymentData = {
-          amount: this.service.fee,
-          orderId: `${this.service.id}_${Date.now()}`,
-          orderName: `펫시터 서비스 - ${this.service.petSitterName}`,
-          customerName: "고객명",
-          successUrl: successUrl,
-          failUrl: failUrl
-        }
-
-        // 토스페이먼츠 테스트 결제 URL
-        const testPaymentUrl = `https://test-pay.toss.im/go/orders/${paymentData.orderId}`
-        window.open(testPaymentUrl, '_blank')
+        window.location.href = response.data.paymentUrl
       } catch (error) {
         console.error('결제 초기화 실패:', error)
         alert('결제 초기화에 실패했습니다. 잠시 후 다시 시도해주세요.')
@@ -85,19 +70,10 @@ export default {
     }
   },
   created() {
-    // URL 쿼리 파라미터에서 서비스 정보 가져오기
-    const { id, petSitterName, availableDay, fee } = this.$route.query
-    
-    if (!id) {
+    // 라우터를 통해 전달받은 서비스 정보
+    this.service = this.$route.params.service
+    if (!this.service) {
       this.$router.push('/service')
-      return
-    }
-
-    this.service = {
-      id,
-      petSitterName,
-      availableDay,
-      fee: Number(fee)
     }
   }
 }

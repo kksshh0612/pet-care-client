@@ -62,22 +62,19 @@ export default {
     },
     async proceedToTossPay() {
       try {
-        // 토스페이먼츠 테스트 결제 URL로 직접 이동
-        const successUrl = `${window.location.origin}/success`
-        const failUrl = `${window.location.origin}/fail`
+        // 백엔드에서 결제 URL을 받아옴
+        const response = await axios.post('/api/v1/payment/toss', {
+          petSitterWorkId: this.service.id,
+          amount: this.service.fee
+        })
         
-        const paymentData = {
-          amount: this.service.fee,
-          orderId: `${this.service.id}_${Date.now()}`,
-          orderName: `펫시터 서비스 - ${this.service.petSitterName}`,
-          customerName: "고객명",
-          successUrl: successUrl,
-          failUrl: failUrl
+        // 받은 URL로 직접 이동 (토스페이먼츠 결제 페이지)
+        if (response.data.paymentUrl) {
+          // 새 창에서 결제 페이지 열기
+          window.open(response.data.paymentUrl, '_blank')
+        } else {
+          throw new Error('결제 URL이 없습니다.')
         }
-
-        // 토스페이먼츠 테스트 결제 URL
-        const testPaymentUrl = `https://test-pay.toss.im/go/orders/${paymentData.orderId}`
-        window.open(testPaymentUrl, '_blank')
       } catch (error) {
         console.error('결제 초기화 실패:', error)
         alert('결제 초기화에 실패했습니다. 잠시 후 다시 시도해주세요.')
